@@ -27,18 +27,29 @@ const Button = styled.button`
     borderRadius: '10%';
     padding: "10px 20px";
     boxShadow: '2px 2px 4px rgba(0, 0, 0,1)';
+    border:none;
 
     &:hover {
-        background-color: Firebrick;
-`;
+        background-color: pink;
+        `;
 
+const Input = styled.input`
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      `;
 const words = ['endou', 'gouenji', 'kidou', 'kazemaru', 'kabeyama',
   'matsuno', 'someoka', 'domon', 'handa',
   'shishido', 'ichinose', 'tsunami', 'fubuki', 'fudou',
-  'sakuma', 'afuro'];
+  'sakuma', 'afuro', 'tachimukay'];
 
 function App() {
     const [isShow, setIsShow] = useState(false);
+    const [name, setName] = useState('')
 
     const [wordToGuess,setWordToGuess] = useState(() => {
         return words[Math.floor(Math.random() * words.length)];
@@ -69,6 +80,7 @@ function App() {
 
 
     useEffect(() => {
+        if (isShow){
         const handler = (e: KeyboardEvent) => {
             const key = e.key.toLowerCase(); 
             if (!key.match(/^[a-z]$/)) return;
@@ -82,16 +94,20 @@ function App() {
 
         return () => {
             document.removeEventListener("keypress", handler);
-        };
-    }, [GuessedLetters]);
+        };}
+    }, [GuessedLetters, isShow]);
 
     
     const restartGame = () => {
         setWordToGuess( words[Math.floor(Math.random() * words.length)]);
         SetGuessedLetters([]);
         };
-    
-
+    const changePlayer = () => {
+        setIsShow(() => false)
+        setName (() => "")
+        setCountLose(()=> 0)
+        setCountWin(()=> 0)
+    };
 
     const isLoser = incorrectGuesses.length >=6;
     const isWinner = wordToGuess.split('').every((letter)=>GuessedLetters.includes(letter))
@@ -112,7 +128,7 @@ function App() {
     
     useEffect(() => {
         const handler = (e:KeyboardEvent) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && (name.trim() != '')) {
              setIsShow(() => true);
             }
         };
@@ -122,17 +138,38 @@ function App() {
         return () => {
             document.removeEventListener('keydown', handler);
         };
-    }, []);
+    }, [name]);
+    useEffect(() => {
+        const handler = (e:KeyboardEvent) => {
+            if (e.key === 'Escape' && (isLoser || isWinner)) {
+                changePlayer();
+                restartGame();
+            }
+        };
+
+        document.addEventListener('keydown', handler);
+
+        return () => {
+            document.removeEventListener('keydown', handler);
+        };
+    }, [isLoser, isWinner]);
 
   return (
         <Wrapper>
-            {!isShow && (
-              <Button onClick={() => setIsShow(true)}>
-                Clique Enter
+            {!isShow && ( 
+            <div style={{gap:'20px', display:'flex', flexDirection:'column' }}>
+              <Button disabled={(name.trim() === '')} onClick={() => setIsShow(true)}>
+                {name.trim() === ''? 'Não adianta clicar enter' : 'Clique enter'}
+                
               </Button>
+              <Input placeholder='Digite o nome do jogador'
+              value={name}
+              onChange={(e) => setName(e.target.value)}/>
+            </div>
            
             )}
-            <Score countWin={countWin} countLoser={countLose} restartGame={restartGame} isLoser={isLoser} isWinner={isWinner}/>
+            
+            <Score countWin={countWin} countLoser={countLose} restartGame={restartGame} isLoser={isLoser} isWinner={isWinner} name={name}/>
 
             {isShow && (
                 <HangmanParts>
