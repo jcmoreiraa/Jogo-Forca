@@ -1,16 +1,17 @@
 import  { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import './App.css';
-import Keyboard from './Keyboard';
-import HangmanDrawing from './hangman-drawing';
-import HangmanWord from './hangman-word';
-import Score from './score';
+import Keyboard from './components/Keyboard';
+import HangmanDrawing from './components/hangman-drawing';
+import HangmanWord from './components/hangman-word';
+import Score from './components/score';
 
 const HangmanParts = styled.div`
     display: flex;
     flex-direction: column;
     gap: 2rem;
     width: 350px;
+    padding-right:100px;
     @media (max-width: 500px) {
         padding-right:100px;
     }
@@ -26,7 +27,8 @@ const Wrapper = styled.div`
     gap: 1rem;
     align-items: center;
     @media (max-width: 600px) {
-        padding-top:50px;
+    }
+    @media (max-width: 500px) {
     }
     
 `;
@@ -71,9 +73,27 @@ function App() {
         if (GuessedLetters.includes(letter) || isLoser||isWinner) return;
         SetGuessedLetters(GuessedLetters => [...GuessedLetters, letter]);
     }
+    function restartGame() {
+        setWordToGuess( words[Math.floor(Math.random() * words.length)]);
+        SetGuessedLetters([]);
+
+    };
+
+    function changePlayer() {
+        setIsShow(() => false);
+        setName(() => "");
+        setCountLose(() => 0);
+        setCountWin(() => 0);
+        restartGame();
+    }
 
     const [countWin, setCountWin] = useState(0);
     const [countLose,setCountLose ] = useState(0);
+    const isLoser = incorrectGuesses.length >=6;
+    const isWinner = wordToGuess.split('').every((letter)=>GuessedLetters.includes(letter))
+    const buttonStyle = name.trim() != ""
+    ? { animation: 'pulse 1s steps(2, start) infinite' }
+    : {};
 
     useEffect(()=>{
         if (isWinner){
@@ -88,6 +108,7 @@ function App() {
 
 
     useEffect(() => {
+        
         if (isShow){
         const handler = (e: KeyboardEvent) => {
             const key = e.key.toLowerCase(); 
@@ -104,23 +125,9 @@ function App() {
             document.removeEventListener("keypress", handler);
         };}
     }, [GuessedLetters, isShow]);
-
-    
-    const restartGame = () => {
-        setWordToGuess( words[Math.floor(Math.random() * words.length)]);
-        SetGuessedLetters([]);
-        };
-    const changePlayer = () => {
-        setIsShow(() => false)
-        setName (() => "")
-        setCountLose(()=> 0)
-        setCountWin(()=> 0)
-    };
-
-    const isLoser = incorrectGuesses.length >=6;
-    const isWinner = wordToGuess.split('').every((letter)=>GuessedLetters.includes(letter))
     
     useEffect(() => {
+
         const handler = (e:KeyboardEvent) => {
             if (e.key === 'Enter' && (isLoser || isWinner)) {
                 restartGame();
@@ -135,6 +142,7 @@ function App() {
     }, [isLoser, isWinner]);
     
     useEffect(() => {
+
         const handler = (e:KeyboardEvent) => {
             if (e.key === 'Enter' && (name.trim() != '')) {
              setIsShow(() => true);
@@ -148,10 +156,11 @@ function App() {
         };
     }, [name]);
     useEffect(() => {
+
         const handler = (e:KeyboardEvent) => {
             if (e.key === 'Escape' && (isLoser || isWinner)) {
                 changePlayer();
-                restartGame();
+                
             }
         };
 
@@ -161,12 +170,13 @@ function App() {
             document.removeEventListener('keydown', handler);
         };
     }, [isLoser, isWinner]);
+    
 
   return (
         <Wrapper>
             {!isShow && ( 
-            <div style={{gap:'20px', display:'flex', flexDirection:'column' }}>
-              <Button disabled={(name.trim() === '')} onClick={() => setIsShow(true)}>
+            <div style={{gap:'20px', display:'flex', flexDirection:'column', paddingBottom:'100px' }}>
+              <Button style={buttonStyle}  disabled={(name.trim() === '')} onClick={() => setIsShow(true)}>
                 {name.trim() === ''? 'Não adianta clicar enter' : 'Clique enter'}
                 
               </Button>
@@ -176,19 +186,20 @@ function App() {
             </div>
            
             )}
+            {isShow&&(
             
-            <Score countWin={countWin} countLoser={countLose} restartGame={restartGame} isLoser={isLoser} isWinner={isWinner} name={name}/>
+            <Score countWin={countWin} countLoser={countLose} restartGame={restartGame} isLoser={isLoser} isWinner={isWinner} name={name} changePlayer={changePlayer}/>)}
 
             {isShow && (
                 <HangmanParts>
-                    {(isShow && (!isWinner && !isLoser) )&& <h2>Jogo da Forca</h2>}
+                    {(isShow && (!isWinner && !isLoser) )&& <h2 style={{paddingLeft:'30px', color:'white'}}>Jogo da Forca</h2>}
                     <HangmanDrawing NumberOfGuesses={incorrectGuesses.length}/>
                     <HangmanWord GuessedLetters={GuessedLetters} word={wordToGuess} reveal={isLoser}/>
                 </HangmanParts>
             )}
             
             {(!isWinner && !isLoser && isShow) && (
-                <h4> Personagens de Super Onze</h4>)}
+                <h4 style={{color:'white'}}> Personagens de Super Onze</h4>)}
 
             {isShow && <div>
                 <Keyboard 

@@ -1,27 +1,29 @@
 import styled from "styled-components"
 
 const keys = [
-    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
-]
+    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm'
+
+];
 
 const Wrapper = styled.div`
 display: grid;
-grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-gap:0.3rem;
-width: 700px;
-display:none;
+grid-template-columns: repeat(auto-fit, minmax(60px, 2fr));
+gap:0.5rem;
+width: 650px;
 margin-bottom:20px;
 @media(max-width:600px){
 width: 450px;
-grid-template-columns: repeat(auto-fit, minmax(50px,2fr));
-gap:0.8rem;
-display:inline-block;
+    display: grid;
+    text-align:center;
+grid-template-columns: repeat(auto-fit, minmax(50px, 2fr));
+gap:0.3rem;
 }
 @media(max-width:500px){
     width: 350px;
-    grid-template-columns: repeat(auto-fit, minmax(40px,2fr));
-    gap:0.5rem;
-    display:inline-block;
+    display: grid;
+    text-align:center;
+grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+gap:0.3rem;
 }
 
 `
